@@ -7,7 +7,7 @@ from config import settings
 from ai import FakeAI
 from sqlalchemy.orm import Session
 from typing import Optional, List
-from background import cleanup_author_old_tweets
+from background import cleanup_author_old_tweets, cleanup_author_old_tweets_optimized
 from fastapi import BackgroundTasks
 
 
@@ -67,7 +67,7 @@ async def generate(
         db.refresh(new_tweet)
 
         # Add background task to cleanup old tweets for the same author
-        background_tasks.add_task(cleanup_author_old_tweets, new_tweet.author_email)
+        background_tasks.add_task(cleanup_author_old_tweets_optimized, new_tweet.author_email)
         
         return new_tweet
     except Exception as e:
