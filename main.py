@@ -1,13 +1,12 @@
-from fastapi import FastAPI, Depends, HTTPException, Request, Header
+from fastapi import FastAPI, Depends, HTTPException, Header
 from models import create_tables, get_db, Tweet
 from contextlib import asynccontextmanager
 
-from fastapi.security import APIKeyHeader
 from schemas import GenerateRequest,GenerateResponse
 from config import settings
 from ai import FakeAI
 from sqlalchemy.orm import Session
-from typing import Optional
+from typing import Optional, List
 
 
 
@@ -73,3 +72,16 @@ async def generate(
 
 # TODO: Retrieve all tweets from the database, sorted by author name (ascending) and created_at (descending).
 
+
+@app.get("/tweets", response_model=List[GenerateResponse])
+async def get_tweets(
+    db: Session = Depends(get_db),
+    api_key: str = Depends(verify_api_key)
+    ):
+    """Retrieve all tweets sorted by author name (asc) and created_at (desc)"""
+    tweets = db.query(Tweet).order_by(
+        Tweet.author_name.asc(),
+        Tweet.created_at.desc()
+    ).all()
+    
+    return tweets
