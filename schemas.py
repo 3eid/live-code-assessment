@@ -11,10 +11,15 @@ class GenerateRequest(BaseModel):
     location:str
     language:str
 
+class Context(BaseModel):
+    topic: str
+    location: str
+    language: str
+
 
 class GenerateResponse(BaseModel):
     id: int = Field(..., description="Unique ID of the tweet")
-    context: Dict = Field(..., description="Context information as JSON")
+    context: Context = Field(..., description="Context information as JSON")
     tweet: str = Field(..., description="The tweet text")
     author_name: str = Field(..., description="Name of the author")
     author_email: EmailStr = Field(..., description="Email of the author")
