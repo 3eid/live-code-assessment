@@ -7,7 +7,8 @@ from config import settings
 from ai import FakeAI
 from sqlalchemy.orm import Session
 from typing import Optional, List
-
+from background import cleanup_author_old_tweets
+from fastapi import BackgroundTasks
 
 
 # Create tables on startup
@@ -41,6 +42,7 @@ def read_root():
 @app.post("/generate", response_model=GenerateResponse)
 async def generate(
     request: GenerateRequest,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     api_key: str = Depends(verify_api_key)
     ):
@@ -63,6 +65,10 @@ async def generate(
         db.add(new_tweet)
         db.commit()
         db.refresh(new_tweet)
+
+        # Add background task to cleanup old tweets for the same author
+        background_tasks.add_task(cleanup_author_old_tweets, new_tweet.author_email, db)
+        
         return new_tweet
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
