@@ -23,3 +23,6 @@ class GenerateResponse(BaseModel):
     # because we will return the SQLAlchemy model instance in the endpoint
     class Config:
         from_attributes = True  
+
+class GetTweetsResponse(BaseModel):
+    tweets: list[GenerateResponse]
