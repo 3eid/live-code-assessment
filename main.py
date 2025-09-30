@@ -67,7 +67,7 @@ async def generate(
         db.refresh(new_tweet)
 
         # Add background task to cleanup old tweets for the same author
-        background_tasks.add_task(cleanup_author_old_tweets, new_tweet.author_email, db)
+        background_tasks.add_task(cleanup_author_old_tweets, new_tweet.author_email)
         
         return new_tweet
     except Exception as e:
